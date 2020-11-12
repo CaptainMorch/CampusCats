@@ -1,0 +1,68 @@
+version: '3.3'
+
+services:
+    db:
+        container_name: mysql
+        image: mysql:latest
+        restart: always
+        expose:
+            - "3306"
+        volumes:
+            - mysql_data:/var/lib/mysql
+        environment:
+            MYSQL_ROOT_PASSWORD_FILE: /run/secrets/mysql_root_password
+        volumes:
+            - ./secrets/mysql:/etc/mysql/conf.d
+        secrets:
+            - mysql_root_password
+
+    web:
+        container_name: django
+        build: campuscats/
+        restart: always
+        expose:
+            - "8000"
+        depends_on:
+            - db
+        secrets:
+            - site_secret_key
+            - mysql_conf
+        configs:
+            - source: gunicorn_settings
+              target: /gunicorn.conf.py
+            - source: site_settings
+              target: /home/app/web/campuscats/campuscats/site_settings.py
+        volumes:
+            - static_files:/home/app/web/static_root
+            - media_files:/home/app/web/media_root
+
+    nginx:
+        container_name: nginx
+        image: nginx:mainline-alpine
+        restart: always
+        ports: 
+            - "80:80"
+        depends_on:
+            - web
+        volumes:
+            - ./nginx:/etc/nginx/conf.d
+            - static_files:/home/app/web/static_root
+
+configs:
+    gunicorn_settings:
+        file: ./gunicorn.conf.py
+    site_settings:
+        file: ./site_settings.py
+
+secrets:
+    mysql_root_password:
+        file: secrets/mysql_root_password.txt
+    mysql_conf:
+        file: secrets/mysql/my.cnf
+    site_secret_key:
+        file: secrets/site_secret_key.txt
+
+volumes:
+    mysql_data:
+    static_files:
+    media_files:
