@@ -1,0 +1,2 @@
+MYSQL_DATABASE=campuscats
+MYSQL_USER=app

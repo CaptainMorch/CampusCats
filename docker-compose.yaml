@@ -3,18 +3,22 @@ version: '3.3'
 services:
     db:
         container_name: mysql
-        image: mysql:latest
+        image: mysql:8
         restart: always
         expose:
             - "3306"
         volumes:
             - mysql_data:/var/lib/mysql
+        env_file:
+            - env_file
         environment:
             MYSQL_ROOT_PASSWORD_FILE: /run/secrets/mysql_root_password
-        volumes:
-            - ./secrets/mysql:/etc/mysql/conf.d
+            MYSQL_PASSWORD_FILE: /run/secrets/mysql_password
         secrets:
             - mysql_root_password
+            - mysql_password
+        # MySQL 8.0 changed this default value but our connector hasn't
+        command: --default-authentication-plugin=mysql_native_password
 
     web:
         container_name: django
@@ -24,14 +28,15 @@ services:
             - "8000"
         depends_on:
             - db
+        env_file:
+            - env_file
         secrets:
             - site_secret_key
-            - mysql_conf
-        configs:
-            - source: gunicorn_settings
-              target: /gunicorn.conf.py
+            - mysql_password
             - source: site_settings
-              target: /home/app/web/campuscats/campuscats/site_settings.py
+              target: site_settings/settings.py
+            - source: gunicorn_settings
+              target: gunicorn.conf.py
         volumes:
             - static_files:/home/app/web/static_root
             - media_files:/home/app/web/media_root
@@ -48,19 +53,17 @@ services:
             - ./nginx:/etc/nginx/conf.d
             - static_files:/home/app/web/static_root
 
-configs:
-    gunicorn_settings:
-        file: ./gunicorn.conf.py
-    site_settings:
-        file: ./site_settings.py
-
 secrets:
     mysql_root_password:
-        file: secrets/mysql_root_password.txt
-    mysql_conf:
-        file: secrets/mysql/my.cnf
+        file: ./secrets/mysql_root_password.txt
     site_secret_key:
-        file: secrets/site_secret_key.txt
+        file: ./secrets/site_secret_key.txt
+    mysql_password:
+        file: ./secrets/mysql_password.txt
+    site_settings:
+        file: ./site_settings.py
+    gunicorn_settings:
+        file: ./gunicorn.conf.py
 
 volumes:
     mysql_data:

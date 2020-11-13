@@ -11,7 +11,18 @@ https://docs.djangoproject.com/en/3.1/ref/settings/
 """
 
 from pathlib import Path
-from . import site_settings
+import sys, os
+
+# Import /run/secrets/site_settings/settings.py
+# See: /docker-compose.yaml
+sys.path.append('/run/secrets/site_settings')
+from settings import *
+
+with open('/run/secrets/site_secret_key') as key, \
+        open('/run/secrets/mysql_password') as pwd:
+    SECRET_KEY = key.read().strip()
+    DATABASE_PASSWORD = pwd.read().strip()
+
 
 # Build paths inside the project like this: BASE_DIR / 'subdir'.
 BASE_DIR = Path(__file__).resolve().parent.parent
@@ -20,15 +31,11 @@ BASE_DIR = Path(__file__).resolve().parent.parent
 # Quick-start development settings - unsuitable for production
 # See https://docs.djangoproject.com/en/3.1/howto/deployment/checklist/
 
-# SECURITY WARNING: keep the secret key used in production secret!
-with open('/run/secrets/site_secret_key') as f:
-    SECRET_KEY = f.read()
-
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = False
 
-ALLOWED_HOSTS = []
-ALLOWED_HOSTS += site_settings.ALLOWED_HOSTS
+# Don't modify here. Edit site_settings.py instead.
+# ALLOWED_HOSTS = []
 
 
 # Application definition
@@ -79,9 +86,11 @@ WSGI_APPLICATION = 'campuscats.wsgi.application'
 DATABASES = {
     'default': {
         'ENGINE': 'django.db.backends.mysql',
-        'OPTIONS': {
-            'read_default_file': '/run/secrets/mysql_conf',
-        },
+        'HOST': 'mysql',
+        'PORT': 3306,
+        'NAME': os.getenv('MYSQL_DATABASE'),
+        'USER': os.getenv('MYSQL_USER'),
+        'PASSWORD': DATABASE_PASSWORD
     }
 }
 
@@ -125,5 +134,5 @@ USE_TZ = True
 STATIC_URL = '/static/'
 STATIC_ROOT = BASE_DIR / 'static_root'
 
-MEDIA_URL = 'media'
+MEDIA_URL = '/media/'
 MEDIA_ROOT = BASE_DIR / 'media_root'
