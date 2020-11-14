@@ -86,6 +86,14 @@ OK， 现在设置项目：
   echo 一个密钥 > site_secret_key.txt        # 设置站点密钥（随机字符串）
   cd ../
   ```
+- (可选) 如果有需要添加的环境变量，自行编辑 [`env_file`](../env_file) 添加。
+  
+  比如，gunicore 默认使用 核数\*2 +1 个工作进程。若处于工作电脑上的测试环境，你很可能希望将进程数设置为 3 ：
+  ```
+  # ./env_file
+  ... ...
+  GUNICORN_CMD_ARGS="--workers=3"
+  ```
 - (可选) 如果了解且认为需要，再自行编辑 [`campuscats/campuscats/settings.py`](../campuscats/campuscats/settings.py)
 
 ## 部署
