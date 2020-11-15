@@ -10,10 +10,12 @@ services:
         volumes:
             - mysql_data:/var/lib/mysql
         env_file:
-            - env_file
-        environment:
+            - ./settings/.env
+        environment:    
             MYSQL_ROOT_PASSWORD_FILE: /run/secrets/mysql_root_password
             MYSQL_PASSWORD_FILE: /run/secrets/mysql_password
+            MYSQL_DATABASE: campuscats
+            MYSQL_USER: app
         secrets:
             - mysql_root_password
             - mysql_password
@@ -28,15 +30,15 @@ services:
         depends_on:
             - db
         env_file:
-            - env_file
+            - ./settings/.env
+        environment:
+            DJANGO_SETTINGS_MODULE: local_settings
+            PYTHONPATH: /home/app/web/settings
         secrets:
             - site_secret_key
             - mysql_password
-            - source: site_settings
-              target: site_settings/settings.py
-            - source: gunicorn_settings
-              target: gunicorn.conf.py
         volumes:
+            - ./settings:/home/app/web/settings
             - static_files:/home/app/web/static_root
             - media_files:/home/app/web/media_root
 
@@ -49,7 +51,7 @@ services:
         depends_on:
             - web
         volumes:
-            - ./nginx:/etc/nginx/conf.d
+            - ./settings/nginx:/etc/nginx/conf.d
             - static_files:/home/app/web/static_root
 
 secrets:
@@ -59,10 +61,6 @@ secrets:
         file: ./secrets/site_secret_key.txt
     mysql_password:
         file: ./secrets/mysql_password.txt
-    site_settings:
-        file: ./site_settings.py
-    gunicorn_settings:
-        file: ./gunicorn.conf.py
 
 volumes:
     mysql_data:

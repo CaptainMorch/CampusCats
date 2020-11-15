@@ -11,17 +11,6 @@ https://docs.djangoproject.com/en/3.1/ref/settings/
 """
 
 from pathlib import Path
-import sys, os
-
-# Import /run/secrets/site_settings/settings.py
-# See: /docker-compose.yaml
-sys.path.append('/run/secrets/site_settings')
-from settings import *
-
-with open('/run/secrets/site_secret_key') as key, \
-        open('/run/secrets/mysql_password') as pwd:
-    SECRET_KEY = key.read().strip()
-    DATABASE_PASSWORD = pwd.read().strip()
 
 
 # Build paths inside the project like this: BASE_DIR / 'subdir'.
@@ -34,8 +23,7 @@ BASE_DIR = Path(__file__).resolve().parent.parent
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = False
 
-# Don't modify here. Edit site_settings.py instead.
-# ALLOWED_HOSTS = []
+ALLOWED_HOSTS = []
 
 
 # Application definition
@@ -78,22 +66,6 @@ TEMPLATES = [
 ]
 
 WSGI_APPLICATION = 'campuscats.wsgi.application'
-
-
-# Database
-# https://docs.djangoproject.com/en/3.1/ref/settings/#databases
-
-DATABASES = {
-    'default': {
-        'ENGINE': 'django.db.backends.mysql',
-        'HOST': 'mysql',
-        'PORT': 3306,
-        'NAME': os.getenv('MYSQL_DATABASE'),
-        'USER': os.getenv('MYSQL_USER'),
-        'PASSWORD': DATABASE_PASSWORD
-    }
-}
-
 
 # Password validation
 # https://docs.djangoproject.com/en/3.1/ref/settings/#auth-password-validators

@@ -6,7 +6,9 @@ services:
 before_install:
     - docker --version
     - docker-compose --version
-    - echo "GUNICORN_CMD_ARGS=--workers=3" >> env_file
+    - cp settings/{__,}local_settings.py
+    - cp settings/{env_file,.env}
+    - echo "GUNICORN_CMD_ARGS=--workers=3" >> settings/.env
     - docker-compose build
     - docker-compose up -d
     - docker ps -a

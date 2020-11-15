@@ -70,15 +70,31 @@ git clone https://github.com/CaptainMorch/CampusCats.git
 
 OK， 现在设置项目：
 
-- 编辑 [`./site_settings.py`](../site_settings.py) 如下：
+- 复制模板项目设置文件 [`settings/__local_settings.py`](../settings/__local_site_settings.py) 为 `settings/local_settings.py`，
+  ```bash
+  cp ./settings/{__,}local_settings.py
+  ```
+  并进行如下编辑：
   ```python
-  # (可选)添加你的网站域名（不需要本地访问则删去前三项默认值）
-  ALLOWED_HOST = ['localhost', '0.0.0.0', '127.0.0.1', 'yourhost.com']
+  # 添加你的网站域名（需要本地访问则添加`'localhost'`）
+  ALLOWED_HOST = []
   
   # 你的网站名称
-  SITE_NAME = '某校的猫猫'
+  SITE_NAME = ''
   ```
-- 进入 [`./secrets`](../secrets) 填写所有文件：
+- 复制模板环境变量文件 [`settings/env_file`](../settings/env_file) 为 `settings/.env`。
+  ```bash
+  cp ./settings/{env_file,.env}
+  ```
+  如果需要自定义更改可自行添加。
+  
+  比如，gunicore 默认使用 核数\*2 +1 个工作进程，你可能想要手动设置为某个其他数值，比如 3 ：
+  ```bash
+  # ./env_file
+  ... ...
+  GUNICORN_CMD_ARGS="--workers=3"
+  ```
+- 进入 [`secrets`](../secrets) 填写所有文件：
   ```bash
   cd ./secrets
   echo 一个密码 > mysql_password.txt         # 设置数据库普通用户密码
@@ -86,16 +102,6 @@ OK， 现在设置项目：
   echo 一个密钥 > site_secret_key.txt        # 设置站点密钥（随机字符串）
   cd ../
   ```
-- (可选) 如果有需要添加的环境变量，自行编辑 [`env_file`](../env_file) 添加。
-  
-  比如，gunicore 默认使用 核数\*2 +1 个工作进程。若处于工作电脑上的测试环境，你很可能希望将进程数设置为 3 ：
-  ```
-  # ./env_file
-  ... ...
-  GUNICORN_CMD_ARGS="--workers=3"
-  ```
-- (可选) 如果了解且认为需要，再自行编辑 [`campuscats/campuscats/settings.py`](../campuscats/campuscats/settings.py)
-
 ## 部署
 打包运行容器：
 ```bash
@@ -106,7 +112,7 @@ docker-compose up --build -d
 
 确定网站可以正常访问后，执行以下命令新建后台管理员账号：
 ```bash
-docker exec -it django python manage.py createsuperuser
+docker-compose exec web python manage.py createsuperuser
 ```
 
 至此网站部署完成。关于网站管理维护请点[此处](manage.md)
