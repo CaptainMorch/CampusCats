@@ -26,6 +26,6 @@ RUN chown -R app:app .
 
 USER app:app
 
-CMD gunicorn campuscats.wsgi -c /run/secrets/gunicorn.conf.py
+# CMD gunicorn campuscats.wsgi -c /run/secrets/gunicorn.conf.py
 
 ENTRYPOINT ["/home/app/web/entrypoint.sh"]
