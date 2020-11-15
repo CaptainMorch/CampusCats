@@ -1,4 +1,6 @@
 # CampusCats
+[![Build Status](https://travis-ci.org/CaptainMorch/CampusCats.svg?branch=main)](https://travis-ci.org/CaptainMorch/CampusCats)
+
 校园流浪猫图鉴&amp;管理系统
 
 # 特点
