@@ -1,4 +1,5 @@
 #!/bin/sh
+set -o errexit
 
 # In case that the database is still initalizing
 echo "Waiting for MySQL..."

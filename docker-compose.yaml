@@ -23,7 +23,6 @@ services:
     web:
         container_name: django
         build: campuscats/
-        restart: always
         expose:
             - "8000"
         depends_on:
