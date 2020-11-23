@@ -146,22 +146,22 @@ class CatDetail(models.Model):
         null=True,
         blank=True
         )
-    # avatar = models.ForeignKey(
-    #     'file.Image', 
-    #     verbose_name='头像',
-    #     related_name='+',
-    #     on_delete=models.SET_NULL,
-    #     null=True,
-    #     blank=True
-    #     )
-    # cover_photo = models.ForeignKey(
-    #     'file.Image', 
-    #     verbose_name='封面照',
-    #     related_name='+',
-    #     on_delete=models.SET_NULL,
-    #     null=True,
-    #     blank=True
-    #     )
+    avatar = models.ForeignKey(
+        'file.Photo', 
+        verbose_name='头像',
+        related_name='+',
+        on_delete=models.SET_NULL,
+        null=True,
+        blank=True
+        )
+    cover_photo = models.ForeignKey(
+        'file.Photo', 
+        verbose_name='封面照',
+        related_name='+',
+        on_delete=models.SET_NULL,
+        null=True,
+        blank=True
+        )
 
     class Meta:
         verbose_name = '详细信息'

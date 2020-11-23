@@ -39,6 +39,7 @@ INSTALLED_APPS = [
     'user',
     'campus',
     'cat',
+    'file',
 ]
 
 MIDDLEWARE = [
