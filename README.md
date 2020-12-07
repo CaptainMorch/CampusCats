@@ -1,5 +1,5 @@
 # CampusCats
-[![Build Status](https://travis-ci.org/CaptainMorch/CampusCats.svg?branch=main)](https://travis-ci.org/CaptainMorch/CampusCats)
+[![Build Status](https://travis-ci.org/CaptainMorch/CampusCats.svg?branch=main)](https://travis-ci.org/CaptainMorch/CampusCats) [![codecov](https://codecov.io/gh/CaptainMorch/CampusCats/branch/master/graph/badge.svg)](https://codecov.io/gh/CaptainMorch/CampusCats)
 
 校园流浪猫图鉴&amp;管理系统
 

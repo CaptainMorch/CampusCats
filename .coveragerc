@@ -1,0 +1,12 @@
+[run]
+source = .
+include = *.py
+omit =
+    */migrations/*
+    *test*
+    *settings.py
+    *admin.py
+    *apps.py
+    /manage.py
+    /campuscats/asgi.py
+    /campuscats/wsgi.py
