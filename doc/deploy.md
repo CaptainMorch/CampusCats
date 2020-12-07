@@ -103,17 +103,26 @@ OK， 现在设置项目：
   cd ../
   ```
 ## 部署
-打包运行容器：
-```bash
-docker-compose up --build -d
-```
+- （可选）设置构建变量
 
-打包完成后，还需等待后台执行半分钟左右的初始化，完成后即可正常访问。
+  构建 image 时使用的环境变量。写入 env_file 不会生效，每次构建时都必须写入当前系统的环境变量：
+  ```bash
+  export [ARG_NAME]=[VALUE]
+  ```
+  当前可供使用的构建变量有：
+  - PIP_USE_TUNA: 设置构建时是否要求 pip 使用 TUNA 源进行下载。设置为 ***任何值*** (包括 0) 均导致生效
 
-确定网站可以正常访问后，执行以下命令新建后台管理员账号：
-```bash
-docker-compose exec web python manage.py createsuperuser
-```
+- 打包运行容器：
+  ```bash
+  docker-compose up --build -d
+  ```
+
+  打包完成后，还需等待后台执行半分钟左右的初始化，完成后即可正常访问。
+
+- 确定网站可以正常访问后，执行以下命令新建后台管理员账号：
+  ```bash
+  docker-compose exec web python manage.py createsuperuser
+  ```
 
 至此网站部署完成。关于网站管理维护请点[此处](manage.md)
 
@@ -128,13 +137,7 @@ docker-compose exec web python manage.py createsuperuser
   
 - **部署时 pip 下载包过慢**
   
-  打开 [`campuscats/Dockerfile`](../campuscats/Dockerfile)，看到这几行代码，然后按照注释操作：
-  ```dockerfile
-  # 若网络环境位于国内，pip 默认源难以使用，
-  # 则注释掉以下第一行，再启用第二行即可
-  RUN pip install -r requirements.txt
-  # RUN pip install -r requirements.txt -i https://pypi.tuna.tsinghua.edu.cn/simple
-  ```
+  若网络环境位于国内，需按照本文档[部署部分](#部署)中“设置建构变量”使用 TUNA 源；若不在，请勿设置该变量
 
 - **打开任何页面均显示 400**
   

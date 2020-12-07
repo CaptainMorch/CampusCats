@@ -24,7 +24,10 @@ services:
 
     web:
         container_name: django
-        build: campuscats/
+        build:
+            context: campuscats/
+            args:
+                - PIP_USE_TUNA
         expose:
             - "8000"
         depends_on:
