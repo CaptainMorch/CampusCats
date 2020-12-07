@@ -2,11 +2,7 @@
 set -o errexit
 
 # In case that the database is still initalizing
-echo "Waiting for MySQL..."
-while ! nc -z mysql 3306; do
-    sleep 1
-done
-echo "MySQL started."
+bash ./wait-for-mysql.sh
 
 # Update django things
 echo "Try migrating the database."
