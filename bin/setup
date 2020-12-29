@@ -122,7 +122,7 @@ check_project_config() {
 
 build_image() {
     info "Start building image."
-    docker-compose build -q || die "Fail building."
+    docker-compose build || die "Fail building."
     success "Build successfully."
 }
 
