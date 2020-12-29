@@ -4,6 +4,7 @@ services:
     - docker
 
 before_install:
+    - npm install -g bats
     - docker login -u "${DOCKER_USERNAME}" --password-stdin <<<"${DOCKER_PASSWORD}"
     - cp settings/{__,}local_settings.py
     - cp settings/{env_file,.env}
@@ -13,6 +14,7 @@ before_install:
     - chmod +x ./bin/setup
 
 script:
+    - bats ./tests/test_setup.bats
     - ./bin/setup --no-superuser
     - docker-compose exec web coverage run manage.py test
 
