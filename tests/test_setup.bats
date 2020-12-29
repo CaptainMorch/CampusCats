@@ -237,8 +237,8 @@ EOF
 }
 
 @test "check_grant_privileges_to_test_db: fail" {
-    mysql() { false; }
-    export -f mysql
+    docker-compose() { false; }
+    export -f docker-compose
 
     run grant_privileges_to_test_db
 
@@ -252,7 +252,7 @@ EOF
 @test "main: wrong dir" {
     (   # cd in subshell otherwise 'teardown' makes a mess
         cd ../
-        run bash ./campuscat/bin/setup
+        run bash ./CampusCats/bin/setup
         [[ "${status}" -eq 1 ]]
         [[ "${output}" == *project\ root* ]]
     )
