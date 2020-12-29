@@ -3,6 +3,8 @@
 ## 基本管理
 ```bash
 docker-compose up    # 启动
+docker-compose down    # 停止并移除容器（不移除 volume）
+docker-compose build    # 重新构建 image
 docker-compose exec web [command]    # 执行某命令
 docker-compose exec web python manage.py shell    # django shell
 ```
