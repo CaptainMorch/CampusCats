@@ -11,8 +11,11 @@ python manage.py migrate --noinput
 echo "Collecting static files."
 python manage.py collectstatic --noinput
 
+# tell setup script that we have initialzed
+touch ./.initialized
+
 # Starting server
-echo "Strating gunicorn server."
+echo "Starting gunicorn server..."
 gunicorn campuscats.wsgi -c settings/gunicorn.conf.py
 
 exec "$@"
