@@ -59,11 +59,11 @@ services:
 
 secrets:
     mysql_root_password:
-        file: ./secrets/mysql_root_password.txt
+        file: ./secrets/mysql_root_password
     site_secret_key:
-        file: ./secrets/site_secret_key.txt
+        file: ./secrets/site_secret_key
     mysql_password:
-        file: ./secrets/mysql_password.txt
+        file: ./secrets/mysql_password
 
 volumes:
     mysql_data:
