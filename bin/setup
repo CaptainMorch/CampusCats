@@ -1,0 +1,259 @@
+#!/usr/bin/env bash
+#
+# Validate and initialize docker service
+
+# IMPORTANT: make sure we are in the right place
+if ! [[ -f docker-compose.yaml && -d campuscats ]]; then
+    echo "[ERRO]: You must cd into the project root before running this!" >&2
+    exit 1
+fi
+# shellcheck source=../lib/setup/docs.bash
+if ! source ./lib/setup/docs.bash ; then
+    echo "[ERRO]: Lib './lib/setup/docs.bash' not found."
+    exit 1
+fi
+
+
+# TODO: colorize
+info() { printf '%s\n' "[INFO]: $1"; }
+success() { info "$@"; }
+warn() { printf '%s\n' "[WARN]: $1" >&2 ; }
+erro() { printf '%s\n' "[ERRO]: $1" >&2 ; }
+
+# Usage: die "Something wrong"
+die() { erro "$1"; exit 1;}
+
+
+
+read_args() {
+	while (( $# )); do
+		case "$1" in
+			-t|--test) RUNTEST=1;;
+			--no-superuser) NOSUPER=1;;
+			-h|--help)
+				printf '%s' "${doc_usage}"
+				exit 2
+				;;
+			-*) die "Invalid option '$1'.${doc_usage}" ;;
+			*) die "Accepts no positional argument.${doc_usage}" ;;
+		esac
+		shift
+	done
+}
+
+
+# Make sure docker is available, and no cantainer exists
+check_docker() {
+    info "Testing docker service..."
+
+    local containerExists
+
+    {
+        docker --version \
+            || die "'docker' unavailable. Installed?"
+        docker-compose --version \
+            || die "'docker-compose' unavailable. Installed?"
+    } > /dev/null
+
+    containerExists=$(docker-compose ps -q) \
+        || die "Have problem reaching docker."
+
+    if [[ -n "${containerExists}" ]] ; then
+        die "Container exists.${doc_container_exists}"
+    fi
+
+    success "Docker service ok."
+}
+
+
+# Print a random secret key to stdout
+#   See django's implementation:
+#   https://github.com/django/django/blob/429d089d0a8fbd400e0c010708df4f0d16218970/django/core/management/utils.py#L77-L82
+generate_secret() {
+    local allowed_chars
+    # NOTE: must escape '*' and '-'
+    readonly allowed_chars='[:alnum:]!@#$%^&(_=+)\*\-'
+
+    tr -dc "${allowed_chars}" </dev/urandom \
+    | head -c 50 \
+    | grep '.*' \
+    || die "Fail to generate site secret key."
+}
+
+
+check_project_config() {
+    local -a password_files
+    local pwd_file
+    readonly password_files=('mysql_password' 'mysql_root_password')
+
+    info "Checking project configs..."
+
+    # django core setting
+    if ! [[ -f ./settings/local_settings.py ]]; then
+        die "Project settings file './settings/local_settings.py' not found."
+    fi
+
+    # env file
+    if ! [[ -f ./settings/.env ]]; then
+        info "Enviroment file './settings/.env' not found."
+
+        info "Copy default './settings/env_file' to './settings/.env'."
+        cp ./settings/env_file ./settings/.env \
+            || die "Fail to copy env file."
+    fi
+
+    # password files
+    for pwd_file in "${password_files[@]/#/'./secrets/'}"; do
+        [[ -s "${pwd_file}" ]] \
+            || die "'${pwd_file}' empty or non-existent."
+    done
+
+    # site secret key
+    if [[ -s "./secrets/site_secret_key" ]] ; then
+        warn "Leaving './secrets/site_secret_key' empty is recommended."
+    else
+		info "Secret generated. Write to './secrets/site_secret_key'"
+        generate_secret > ./secrets/site_secret_key
+    fi
+
+    success "Project config ok."
+}
+
+
+build_image() {
+    info "Start building image."
+    docker-compose build -q || die "Fail building."
+    success "Build successfully."
+}
+
+
+clean_up_docker() {
+    info "Do cleanup."
+
+    info "Print docker log."
+    docker-compose logs
+
+    info "Try shutting down."
+    docker-compose stop
+
+    info "Try removing services and volumes."
+    docker-compose down -v
+}
+
+
+# Usage: wait_web_service TIMEOUT
+wait_web_service() {
+    local -i timeout
+    local check_cmd
+
+    timeout="${1}"
+    # shellcheck disable=2016
+    readonly check_cmd='[[ -f "$APP_HOME"/.initialized ]]'
+
+    info "Waiting for initializing. May take a minute..."
+
+    while (( timeout-- )); do
+        if docker-compose exec -T web bash <<<"${check_cmd}"; then
+            return
+        fi
+        sleep 1
+    done
+
+    erro "Timeout reached."
+    clean_up_docker
+    exit 1
+}
+
+
+start_service() {
+    info "Starting service..."
+
+    docker-compose up -d || die "Fail starting"
+
+    wait_web_service 150
+
+    success "Started successfully."
+}
+
+
+# shellcheck disable=2016  # we DO want expanssion in single quote
+grant_privileges_to_test_db() {
+    local sql
+    local get_pwd
+    local mysql_cmd
+    # SQL adapted from docker-library/mysql
+    # https://github.com/docker-library/mysql/blob/1612c574f921f7f1afc13763ce9011fd8e130b19/8.0/docker-entrypoint.sh#L287
+    read -r sql <<'SQL'
+GRANT ALL ON \`test\_${MYSQL_DATABASE//_/\\_}\`.* TO '$MYSQL_USER'@'%' ;
+SQL
+    readonly get_pwd='$(<"$MYSQL_ROOT_PASSWORD_FILE")'
+    readonly mysql_cmd="mysql -u root --password=\"${get_pwd}\" -e \"${sql}\""
+
+    if ! docker-compose exec -T db bash <<<"${mysql_cmd}"; then
+        erro "Unable to grant privileges to test database"
+        return 1
+    fi
+    return 0
+}
+
+
+create_superuser() {
+    echo "Set site admin account (ok to leave email blank):"
+    docker-compose exec web python manage.py createsuperuser \
+        || erro "Fail to create superuser. "
+}
+
+
+do_post_configure() {
+    info "Runnning post-configurations..."
+
+    if ! grant_privileges_to_test_db; then
+        # Fatal to running tests
+        (( RUNTEST )) && { clean_up_docker; exit 1; }
+    fi
+
+    if ! (( NOSUPER )); then
+        create_superuser
+    fi
+
+    success "Done."
+}
+
+
+run_tests() {
+    info "Running tests..."
+    if docker-compose exec web python manage.py test; then
+        success "Test passed."
+    else
+        erro "Test failed"
+    fi
+}
+
+
+# Main function
+main() {
+	local RUNTEST
+	local NOSUPER
+
+	read_args "$@"
+
+	printf '%s' "${doc_welcome}"
+
+	check_docker
+	check_project_config
+
+	build_image
+	start_service
+
+	do_post_configure
+	(( RUNTEST )) && run_tests
+
+	success "${doc_all_done}"
+}
+
+
+if [[ ${FUNCNAME[0]} = "source" ]]; then
+    return
+fi
+
+main "$@"
