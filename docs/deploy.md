@@ -37,9 +37,9 @@ sudo sh get-docker.sh --mirror Aliyun
 sudo systemctl enable docker
 sudo systemctl start docker
 
-# 设置当前用户权限 (optional)
+# 设置当前用户权限
 sudo groupadd docker
-sudo usermod -aG docker $USER
+sudo usermod -aG docker "${USER}"
 
 # 测试 (optional)
 docker run hello-world
@@ -82,7 +82,7 @@ OK， 现在设置项目：
   # 你的网站名称
   SITE_NAME = ''
   ```
-- 复制模板环境变量文件 [`settings/env_file`](../settings/env_file) 为 `settings/.env`。
+- (可选) 复制模板环境变量文件 [`settings/env_file`](../settings/env_file) 为 `settings/.env`。
   ```bash
   cp ./settings/{env_file,.env}
   ```
@@ -94,12 +94,11 @@ OK， 现在设置项目：
   ... ...
   GUNICORN_CMD_ARGS="--workers=3"
   ```
-- 进入 [`secrets`](../secrets) 填写所有文件：
+- 进入 [`secrets`](../secrets) 填写以下文件：
   ```bash
   cd ./secrets
   echo 一个密码 > mysql_password.txt         # 设置数据库普通用户密码
   echo 一个密码 > mysql_root_password.txt    # 设置数据库 root 用户密码
-  echo 一个密钥 > site_secret_key.txt        # 设置站点密钥（随机字符串）
   cd ../
   ```
 ## 部署
@@ -112,18 +111,10 @@ OK， 现在设置项目：
   当前可供使用的构建变量有：
   - PIP_USE_TUNA: 设置构建时是否要求 pip 使用 TUNA 源进行下载。设置为 ***任何值*** (包括 0) 均导致生效
 
-- 打包运行容器：
+- 执行初始化脚本：
   ```bash
-  docker-compose up --build -d
+  bash ./bin/setup
   ```
-
-  打包完成后，还需等待后台执行半分钟左右的初始化，完成后即可正常访问。
-
-- 确定网站可以正常访问后，执行以下命令新建后台管理员账号：
-  ```bash
-  docker-compose exec web python manage.py createsuperuser
-  ```
-
 至此网站部署完成。关于网站管理维护请点[此处](manage.md)
 
 ## Troubleshoot
