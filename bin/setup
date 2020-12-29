@@ -26,19 +26,19 @@ die() { erro "$1"; exit 1;}
 
 
 read_args() {
-	while (( $# )); do
-		case "$1" in
-			-t|--test) RUNTEST=1;;
-			--no-superuser) NOSUPER=1;;
-			-h|--help)
-				printf '%s' "${doc_usage}"
-				exit 2
-				;;
-			-*) die "Invalid option '$1'.${doc_usage}" ;;
-			*) die "Accepts no positional argument.${doc_usage}" ;;
-		esac
-		shift
-	done
+    while (( $# )); do
+        case "$1" in
+            -t|--test) RUNTEST=1;;
+            --no-superuser) NOSUPER=1;;
+            -h|--help)
+                printf '%s' "${doc_usage}"
+                exit 2
+                ;;
+            -*) die "Invalid option '$1'.${doc_usage}" ;;
+            *) die "Accepts no positional argument.${doc_usage}" ;;
+        esac
+        shift
+    done
 }
 
 
@@ -112,7 +112,7 @@ check_project_config() {
     if [[ -s "./secrets/site_secret_key" ]] ; then
         warn "Leaving './secrets/site_secret_key' empty is recommended."
     else
-		info "Secret generated. Write to './secrets/site_secret_key'"
+        info "Secret generated. Write to './secrets/site_secret_key'"
         generate_secret > ./secrets/site_secret_key
     fi
 
@@ -232,23 +232,23 @@ run_tests() {
 
 # Main function
 main() {
-	local RUNTEST
-	local NOSUPER
+    local RUNTEST
+    local NOSUPER
 
-	read_args "$@"
+    read_args "$@"
 
-	printf '%s' "${doc_welcome}"
+    printf '%s' "${doc_welcome}"
 
-	check_docker
-	check_project_config
+    check_docker
+    check_project_config
 
-	build_image
-	start_service
+    build_image
+    start_service
 
-	do_post_configure
-	(( RUNTEST )) && run_tests
+    do_post_configure
+    (( RUNTEST )) && run_tests
 
-	success "${doc_all_done}"
+    success "${doc_all_done}"
 }
 
 

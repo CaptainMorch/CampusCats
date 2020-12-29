@@ -142,7 +142,7 @@ EOF
     mv ./secrets/mysql_password "${bak}"/secrets/
 
     run check_project_config
-    
+
     [[ "${status}" -eq 1 ]]
     [[ "${output}" == *non-existent* ]]
 }
@@ -199,7 +199,7 @@ EOF
     TIMEFORMAT='%0R'    # as interger
     # https://unix.stackexchange.com/a/282391
     time_used=$( { time test_wait_web_service; } 2>&1 )
-    
+
     # capture instantly timeout
     (( time_used >= 1 ))
 }
@@ -220,7 +220,7 @@ EOF
         && [[ $5 == 'GRANT ALL ON `test\_cc\_db`.*'" TO 'user'@'%' ;" ]]
     }
     export -f mysql
- 
+
     docker-compose() {
         if [[ "$1" == "exec" ]]; then
             inner_env="MYSQL_DATABASE=cc_db MYSQL_USER=user \

@@ -14,8 +14,8 @@ doc_all_done=
 #   > doc
 #   > EOF
 set_doc() {
-	IFS='' read -r -d '' "$1" || true
-	printf -v "$1" '\n%s\n' "${!1}"
+    IFS='' read -r -d '' "$1" || true
+    printf -v "$1" '\n%s\n' "${!1}"
 }
 
 
@@ -34,11 +34,11 @@ set_doc doc_welcome <<'EOF'
 | | | | | | | | | | | | | | | | | | | | | | | | | | | | |
 
 Welcome to CampusCats, an opensource web project
-	for better lives of cats living in our campus!
+    for better lives of cats living in our campus!
 
 Visit https://github.com/CaptainMorch/CampusCats
-	for more infomations, reporting issues, 
-	contributing or making suggestions.
+    for more infomations, reporting issues, 
+    contributing or making suggestions.
 EOF
 
 
@@ -49,9 +49,9 @@ This is the setup script for initializing the server for the
 first time. DO NOT run this when project already exists.
 
 Options:
-	-h, --help             Print this message and exit
-	-t, --test             Run tests before quit
-	--no-superuser         Do not create a superuser interactively
+    -h, --help             Print this message and exit
+    -t, --test             Run tests before quit
+    --no-superuser         Do not create a superuser interactively
 EOF
 
 
@@ -61,9 +61,9 @@ This script is NOT for starting the server, and may
 CONFILCT with or even DAMAGE the existed one!
 
 If you modified the code and want to rebuild and start, just run 
-	'docker-compose up --build'
+    'docker-compose up --build'
 If you want to restart from scratch, remove the old one first:
-	'docker-compose down'    # use -v if want to remove volumes also
+    'docker-compose down'    # use -v if want to remove volumes also
 EOF
 
 
