@@ -7,7 +7,6 @@ if ! [[ -f docker-compose.yaml && -d campuscats ]]; then
     echo "[ERRO]: You must cd into the project root before running this!" >&2
     exit 1
 fi
-# shellcheck source=../lib/setup/docs.bash
 if ! source ./lib/setup/docs.bash ; then
     echo "[ERRO]: Lib './lib/setup/docs.bash' not found."
     exit 1

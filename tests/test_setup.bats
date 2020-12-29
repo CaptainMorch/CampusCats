@@ -22,7 +22,6 @@ in_prj_root || {
     exit 1
     }
 
-# shellcheck source=../bin/setup
 source ./bin/setup    # 'load' may handle relative path again
 
 

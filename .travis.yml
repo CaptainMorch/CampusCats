@@ -14,6 +14,7 @@ before_install:
     - chmod +x ./bin/setup
 
 script:
+    - shellcheck -S info -s bash -o all ./tests/test_setup.bats ./bin/setup ./lib/setup/docs.bash
     - bats ./tests/test_setup.bats
     - ./bin/setup --no-superuser
     - docker-compose exec web coverage run manage.py test
