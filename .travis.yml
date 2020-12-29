@@ -17,7 +17,8 @@ script:
     - docker-compose exec web coverage run manage.py test
 
 after_success:
-    - docker-compose exec web bash <(curl -s https://codecov.io/bash) 
+    - ci_env=`bash <(curl -s https://codecov.io/env)`
+    - docker-compose exec $ci_env -T web bash <<<'bash <(curl -s https://codecov.io/bash)'
 
 after_failure:
     - docker-compose logs
