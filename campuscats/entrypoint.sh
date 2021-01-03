@@ -16,6 +16,4 @@ touch ./.initialized
 
 # Starting server
 echo "Starting gunicorn server..."
-gunicorn campuscats.wsgi -c settings/gunicorn.conf.py
-
 exec "$@"

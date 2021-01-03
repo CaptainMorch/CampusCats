@@ -15,6 +15,6 @@
 后端：Django-REST-Framework
 
 # 部署教程
-[这里](doc/deploy.md)
+[这里](docs/deploy.md)
 
 成功部署上线运行了，可以考虑把网站添加到 [网站列表](doc/sites.md) 里。能自行 fork 编辑提交 PR 最好，不行的话邮件我也可以: `captainmorch@gmail.com`

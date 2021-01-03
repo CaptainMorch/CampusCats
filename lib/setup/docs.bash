@@ -72,7 +72,7 @@ All Done! Now the server sould be running in the background.
 You can now open your browser, and enter 'localhost' to view it!
 
 Click below to see what to do next:
-https://github.com/CaptainMorch/CampusCats/blob/main/doc/manage.md
+https://github.com/CaptainMorch/CampusCats/blob/main/docs/manage.md
 
 NOTE:
   This script has finished its duty and SHOULD NOT be excuted again!
