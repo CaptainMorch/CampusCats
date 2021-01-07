@@ -2,6 +2,7 @@ from django.db import models
 from django.conf import settings
 
 from utils import create_choices_class
+from listfield import ListField
 
 # Create your models here.
 class Cat(models.Model):
@@ -68,7 +69,7 @@ class Cat(models.Model):
 
     # Static infomation
     name = models.CharField('名字', max_length=16, blank=True)
-    old_name = models.CharField('曾用名', max_length=32, blank=True)
+    used_names = ListField('曾用名', max_length=32, blank=True)
     gender = models.BooleanField('性别', null=True, blank=True, choices=Gender.choices)
     fur = models.BooleanField('发量', null=True, blank=True, choices=Fur.choices)
     cat_type = models.PositiveSmallIntegerField('毛色', choices=CatType.choices)
