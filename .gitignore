@@ -1,6 +1,7 @@
 dev_settings.py
 secrets/*
 !secrets/README.md
+.vscode
 
 # Byte-compiled / optimized / DLL files
 __pycache__/
