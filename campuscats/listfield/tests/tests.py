@@ -4,7 +4,7 @@ from django.db.models import Model, F, Value, Transform
 from django.db.models.functions import Concat
 from django.core.exceptions import ValidationError
 
-from listfield import ListField
+from listfield.fields import ListField
 from .models import TestModel, Father
 
 

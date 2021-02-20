@@ -2,7 +2,7 @@ from django.db import models
 from django.conf import settings
 
 from utils import create_choices_class
-from listfield import ListField
+from listfield.fields import ListField
 
 # Create your models here.
 class Cat(models.Model):

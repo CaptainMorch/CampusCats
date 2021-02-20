@@ -1,6 +1,6 @@
 # ListField Application
 This application provides a field, and several tools for that field, 
-including two lookups, a form-field and a widget.
+including two lookups, a form-field a widget, and some DJRF stuff.
 
 ## Field
 `listfield.ListField`
@@ -30,3 +30,28 @@ ListField instance!
 
 ### lf_ihas
 Case-insensitive version of `if_has`.
+
+## DJRF Specific
+For django-rest-framework. Consists of a serializer field and a mixin.
+
+### Serializer Field
+`listfield.serializers.ListField`
+
+Corresponding field for rest_framework.serializers.
+
+Must explictly pass 'sep' to it even when default is used.
+
+Usage:
+```python
+class MySerializer(Serializer):
+    lf = listfield.serialzers.ListField(sep=',', max_length=16)
+    ... ...
+```
+
+### Serializer Mixin
+`listfield.serializers.AllowListFieldMixin`
+
+Mix this into rest_framework.serializers.ModelSerializer or 
+it's subclass to enable them to automatically handle ListField,
+then you could just include your ListField in Meta.fields like other
+standard fields.
