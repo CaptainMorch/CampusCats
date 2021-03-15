@@ -152,9 +152,16 @@ wait_web_service() {
     info "Waiting for initializing. May take a minute..."
 
     while (( timeout-- )); do
-        if docker-compose exec -T web bash <<<"${check_cmd}"; then
-            return
-        fi
+        stderr=$(docker-compose exec -T web bash <<<"${check_cmd}" 2>&1 >/dev/null)
+        status="$?"
+
+        [[ -z ${stderr} ]] || {
+            erro "Container unreachable: ${stderr}"
+            clean_up_docker
+            exit 1
+        }
+        (( status )) || return 0
+        
         sleep 1
     done
 

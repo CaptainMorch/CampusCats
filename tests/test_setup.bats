@@ -203,6 +203,27 @@ EOF
     (( time_used >= 1 ))
 }
 
+@test "check_wait_web_service: container unreachable" {
+    docker-compose() {
+        [[ "$1" == "exec" ]] && {
+            echo "container unreachable" >&2;
+            }
+    }
+    export -f docker-compose
+
+    test_wait_web_service() {
+        run wait_web_service 2
+        [[ "${status}" -eq 1 ]] \
+        && [[ "${output}" == *unreachable*cleanup* ]]
+    }
+
+    TIMEFORMAT='%0R'    # as interger
+    # https://unix.stackexchange.com/a/282391
+    time_used=$( { time test_wait_web_service; } 2>&1 )
+
+    # should exit immediately
+    (( time_used < 2 ))
+}
 
 # grant_privileges_to_test_db
 
