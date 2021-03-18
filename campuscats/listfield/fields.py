@@ -1,4 +1,4 @@
-from django.db.models import CharField
+from django.db.models import CharField, Field
 from django.core import checks
 from django.core.exceptions import ValidationError
 
@@ -52,6 +52,9 @@ class ListField(CharField):
     def from_db_value(self, value, expression, connection):
         return self.to_python(value)
 
+    def get_internal_type(self):
+        return "CharField"
+
     def get_prep_value(self, value):
         # this method may also be called on lookup values,
         # so we'd better return value itself as possible as we can
@@ -74,7 +77,7 @@ class ListField(CharField):
         return self.get_prep_value(value)
 
     def formfield(self, **kwargs):
-        defaults = {'form_class': ListFieldFormField}
+        defaults = {'sep': self.sep, 'form_class': ListFieldFormField}
         defaults.update(kwargs)
         return super().formfield(**defaults)
 

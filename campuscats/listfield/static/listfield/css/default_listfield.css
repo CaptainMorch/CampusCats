@@ -1,0 +1,21 @@
+.default-lf-template {
+    display: none;
+}
+
+.default-lf-element {
+    display: inline-block;
+    padding: 3px;
+    margin: 5px;
+    border: 1px #ccc solid;
+    border-radius: 5px;
+    padding-right: 5px;
+}
+
+.default-lf-button {
+    color: #555;
+    cursor: pointer;
+}
+
+.default-lf-button:hover {
+    color: #444;
+}

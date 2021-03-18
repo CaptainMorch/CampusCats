@@ -1,9 +1,9 @@
 # ListField Application
 This application provides a field, and several tools for that field, 
-including two lookups, a form-field a widget, and some DJRF stuff.
+including two lookups, a form-field, a widget, and some DJRF stuff.
 
 ## Field
-`listfield.ListField`
+`listfield.fields.ListField`
 
 A single field to store a list of strings.
 
@@ -14,6 +14,16 @@ Additional kwargs:
 
 `sep`: default to ','. A single non-alphabetic character to use as the
 separator under the hood. Must not appear in the strings to store.
+
+## FormField
+`listfield.forms.ListFieldFormField`
+
+A simple default formfield for ListField. 
+
+## Widget
+`listfield.widgets.DefaultListFieldWidget`
+
+A widget mainly for django admin site, simple but works.
 
 ## Lookups
 Lookup names are prefixed with `lf`(i.e. listfield) to avoid clashes.

@@ -1,0 +1,17 @@
+{% load static %}
+
+<div class="default-lf">
+    <input type="hidden" name="{{ widget.name }}"{% if widget.value != None %} value="{{ widget.value|stringformat:'s' }}"{% endif %}{% include "django/forms/widgets/attrs.html" %}>
+    <div class="default-lf-template">
+        <span></span>
+        <a class="default-lf-button" onclick="DefaultListField.deleteElement(this);">
+            <img src="{% static 'admin/img/inline-delete.svg' %}" alt="delete">
+        </a>
+    </div>
+    <div class="default-lf-new">
+        <input type="text">
+        <a class="default-lf-button" onclick="DefaultListField.addElement(this)">
+            <img src="{% static 'admin/img/icon-addlink.svg' %}" alt="add">
+        </a>
+    </div>
+</div>
