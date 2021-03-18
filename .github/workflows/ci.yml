@@ -2,10 +2,6 @@ name: CI
 
 on: [push, pull_request]
 
-defaults:
-  run:
-    shell: bash
-
 jobs:
   build-and-test:
     runs-on: ubuntu-latest
