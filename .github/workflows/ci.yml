@@ -31,5 +31,6 @@ jobs:
         run: |
           ./bin/setup --no-superuser
           docker-compose exec web coverage run manage.py test
+        shell: bash --noprofile --norc {0}
       - name: Upload Coverage
         uses: codecov/codecov-action@v1
