@@ -19,7 +19,7 @@ jobs:
           password: ${{ secrets.DOCKER_TOKEN }}
       - name: Setup
         run: |
-          npm install -g bats
+          npm install bats
           cp settings/{__,}local_settings.py
           cp settings/{env_file,.env}
           echo "mysql-password" > ./secrets/mysql_password
