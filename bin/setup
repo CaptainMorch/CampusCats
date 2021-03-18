@@ -203,6 +203,15 @@ create_superuser() {
 }
 
 
+collect_static() {
+    info "Collecting static files."
+
+    docker-compose exec web \
+        python manage.py collectstatic --noinput \
+        || erro "Fail to collect static files."
+}
+
+
 do_post_configure() {
     info "Runnning post-configurations..."
 
@@ -214,6 +223,8 @@ do_post_configure() {
     if ! (( NOSUPER )); then
         create_superuser
     fi
+
+    collect_static
 
     success "Done."
 }
