@@ -16,7 +16,7 @@
             const newElement = root.getElementsByClassName(
                 "default-lf-template")[0].cloneNode(true);
             newElement.className = "default-lf-element";
-            newElement.firstElementChild.innerHTML = content;
+            newElement.firstElementChild.textContent = content;
 
             root.appendChild(newElement);
         },
@@ -44,7 +44,7 @@
             const elements = Array.from(
                     root.getElementsByClassName("default-lf-element")
                 ).map(
-                    element => element.firstElementChild.innerHTML
+                    element => element.firstElementChild.textContent
                 );
             hiddenInput.value = sep + elements.join(sep) + sep;
 
