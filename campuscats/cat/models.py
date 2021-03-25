@@ -68,8 +68,8 @@ class Cat(models.Model):
         )
 
     # Static infomation
-    name = models.CharField('名字', max_length=16, blank=True)
-    used_names = ListField('曾用名', max_length=32, blank=True)
+    name = models.CharField('名字', max_length=8, blank=True)
+    used_names = ListField('曾用名', max_length=16, blank=True)
     gender = models.BooleanField('性别', null=True, blank=True, choices=Gender.choices)
     fur = models.BooleanField('发量', null=True, blank=True, choices=Fur.choices)
     cat_type = models.PositiveSmallIntegerField('毛色', choices=CatType.choices)
@@ -94,6 +94,14 @@ class Cat(models.Model):
         limit_choices_to={'gender': Gender.GIRL.value},
         null=True,
         blank=True,
+        )
+    avatar = models.ForeignKey(
+        'file.Photo', 
+        verbose_name='头像',
+        related_name='+',
+        on_delete=models.SET_NULL,
+        null=True,
+        blank=True
         )
 
     # status
@@ -138,20 +146,19 @@ class CatDetail(models.Model):
     source = models.PositiveSmallIntegerField('来源', null=True, blank=True, choices=Source.choices)
     last_update = models.DateField('最近更新')
     documented_date = models.DateField('档案创建', auto_now_add=True)
+    locations = models.ManyToManyField(
+        'campus.Location',
+        verbose_name='活动位置',
+        related_name='cats',
+        related_query_name='cat',
+        blank=True,
+    )
     parent = models.ForeignKey(
         settings.AUTH_USER_MODEL, 
         verbose_name='紧急联系人', 
         on_delete=models.SET_NULL,
         related_name='kids',
         related_query_name='kid',
-        null=True,
-        blank=True
-        )
-    avatar = models.ForeignKey(
-        'file.Photo', 
-        verbose_name='头像',
-        related_name='+',
-        on_delete=models.SET_NULL,
         null=True,
         blank=True
         )
