@@ -28,3 +28,13 @@ ALLOWED_HOSTS = ['localhost', '0.0.0.0', '127.0.0.1']
 
 # Overwrite project settings, or add your own below:
 SITE_NAME = '测试'
+
+TRUSTING_FUNCTION = 'campuscats.utils.auth.trust_by_network_email'
+TRUSTED_EMAIL_DOMAINS = ['@example.edu.cn']    # add '' to allow all
+# Find networks of your university here:
+# https://github.com/CaptainMorch/certnet_network_list
+TRUSTED_NETWORKS = [
+    ('0.0.0.0', '0.0.0.255'),    # IP range
+    '0.0.0.0/24',                # IP network
+    '0.0.1.0',                   # IP
+    ]
