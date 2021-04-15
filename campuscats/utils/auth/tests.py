@@ -3,7 +3,7 @@ from django.test import TestCase, override_settings
 from django.http import HttpRequest
 from . import (
     parse_trusted_networks_setting, is_email_trusted, 
-    is_group_trusted, is_network_trusted)
+    is_group_trusted, is_network_trusted, is_trusted)
 from user.models import User
 
 
@@ -74,3 +74,24 @@ class TrustingFunctionsTestCase(TestCase):
 
         request.META['REMOTE_ADDR'] = '1.0.0.0'
         self.assertFalse(is_network_trusted(request))
+
+
+class IsTrustedTestCase(TestCase):
+    SETTINGS = {
+        'TRUSTING_FUNCTION': 'utils.auth.trust_only_staff',
+    }
+
+    @override_settings(**SETTINGS)
+    def test_base(self):
+        request = HttpRequest()
+        user = User()
+        request.user = user
+
+        self.assertFalse(is_trusted(request))
+
+        # cached, still False
+        user.is_staff = True
+        self.assertFalse(is_trusted(request))
+
+        del request.is_trusted
+        self.assertTrue(is_trusted(request))

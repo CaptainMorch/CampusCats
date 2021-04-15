@@ -1,4 +1,5 @@
 import ipaddress
+from django.utils.module_loading import import_string
 from django.conf import settings
 
 
@@ -85,3 +86,16 @@ def trust_by_network_email_group(request):
         trust_by_network_email(request),
         is_group_trusted(request),
     )
+
+
+# Entry function for application code
+def is_trusted(request):
+    """Determin whether a request is trusted according to your setting"""
+    # use cached value if exists
+    if hasattr(request, 'is_trusted'):
+        return request.is_trusted
+
+    trusting_function = import_string(settings.TRUSTING_FUNCTION)
+    trusted = trusting_function(request)
+    request.is_trusted = trusted    # cache the value
+    return trusted
