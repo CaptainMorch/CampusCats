@@ -33,8 +33,9 @@ TRUSTING_FUNCTION = 'utils.trusting.trust_by_network_email'
 TRUSTED_EMAIL_DOMAINS = ['@example.edu.cn']    # add '' to allow all
 # Find networks of your university here:
 # https://github.com/CaptainMorch/certnet_network_list
-TRUSTED_NETWORKS = [
+from utils.trusting.parser import parse_trusted_networks_setting
+TRUSTED_NETWORKS = parse_trusted_networks_setting(
     ('0.0.0.0', '0.0.0.255'),    # IP range
     '0.0.0.0/24',                # IP network
     '0.0.1.0',                   # IP
-    ]
+)

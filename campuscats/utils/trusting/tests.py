@@ -21,34 +21,36 @@ class ParseTrustedNetworksSettingTestCase(TestCase):
             + [IPv4Network('0.0.0.0/23')]\
             + [IPv4Network(f'0.0.{i}.0/24') for i in range(2, 5)]\
             + [IPv4Network('0.0.0.2/32')]
-        output = parse_trusted_networks_setting(SETTING)
+        output = parse_trusted_networks_setting(*SETTING)
         self.assertListEqual(output, EXPECTED)
 
     def test_invalid_address(self):
         self.assertRaisesRegex(
             ValueError, '"0.0.0.666" should be',
             parse_trusted_networks_setting,
-            ['0.0.0.666'])
+            '0.0.0.666')
 
     def test_invalid_range(self):
         self.assertRaisesRegex(
             ValueError, 'should be a 2-tuple',
             parse_trusted_networks_setting,
-            [('0.0.0.0',)]
+            ('0.0.0.0',)
         )
 
     def test_invalid_range_address(self):
         self.assertRaisesRegex(
             ValueError, 'contains invalid',
             parse_trusted_networks_setting,
-            [('0.0.0.666', '0.0.0.1')]
+            ('0.0.0.666', '0.0.0.1')
         )
 
 
 class TrustingFunctionsTestCase(TestCase):
     SETTING = {
         'TRUSTED_EMAIL_DOMAINS': ['@example.edu.cn', '@example2.edu'],
-        'TRUSTED_NETWORKS': [('0.0.0.0', '0.0.0.255'), '1.1.1.1'],
+        'TRUSTED_NETWORKS': parse_trusted_networks_setting(
+                ('0.0.0.0', '0.0.0.255'), '1.1.1.1',
+            ),
         'TRUSTED_USER_GROUP': 'trusted',
     }
     

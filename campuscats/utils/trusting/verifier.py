@@ -16,7 +16,7 @@ def is_email_trusted(request):
 
 def is_network_trusted(request):
     address = IPv4Address(request.META['REMOTE_ADDR'])
-    networks = parse_trusted_networks_setting(settings.TRUSTED_NETWORKS)
+    networks = settings.TRUSTED_NETWORKS
     return any(address in network for network in networks)
 
 def is_group_trusted(request):

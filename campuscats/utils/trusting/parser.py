@@ -1,10 +1,10 @@
 import ipaddress
 
 
-def parse_trusted_networks_setting(setting):
+def parse_trusted_networks_setting(*entries):
     """parse the setting to a list of IPv4Network"""
     domains = []
-    for entry in setting:
+    for entry in entries:
         if isinstance(entry, str):
             # should represent network or ip address.
             # sigle ip address will be convert to a sigle-address network
