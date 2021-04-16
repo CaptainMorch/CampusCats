@@ -1,10 +1,11 @@
 from ipaddress import IPv4Address, IPv4Network
 from django.test import TestCase, override_settings
 from django.http import HttpRequest
-from . import (
-    parse_trusted_networks_setting, is_email_trusted, 
-    is_group_trusted, is_network_trusted, is_trusted)
+
 from user.models import User
+from .verifier import is_email_trusted, is_group_trusted, is_network_trusted
+from .parser import parse_trusted_networks_setting
+from . import is_trusted
 
 
 class ParseTrustedNetworksSettingTestCase(TestCase):
