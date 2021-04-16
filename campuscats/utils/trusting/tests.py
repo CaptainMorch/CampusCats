@@ -5,7 +5,7 @@ from django.http import HttpRequest
 from user.models import User
 from .verifier import is_email_trusted, is_group_trusted, is_network_trusted
 from .parser import parse_trusted_networks_setting
-from . import is_trusted
+from . import is_trusted, TrustingMiddleware
 
 
 class ParseTrustedNetworksSettingTestCase(TestCase):
@@ -79,22 +79,21 @@ class TrustingFunctionsTestCase(TestCase):
         self.assertFalse(is_network_trusted(request))
 
 
-class IsTrustedTestCase(TestCase):
-    SETTINGS = {
-        'TRUSTING_FUNCTION': 'utils.trusting.trust_only_staff',
-    }
+@override_settings(TRUSTING_FUNCTION='utils.trusting.trust_only_staff')
+class TrustingMiddlewareTestCase(TestCase):
+    def do_nothing(self, request):
+        return request
 
-    @override_settings(**SETTINGS)
-    def test_base(self):
+    def test_middleware(self):
         request = HttpRequest()
-        user = User()
-        request.user = user
+        request.user = User()
+        processed = TrustingMiddleware(self.do_nothing)(request)
 
-        self.assertFalse(is_trusted(request))
+        self.assertIs(processed.is_trusted, False)
 
+        processed.user.is_staff = True
         # cached, still False
-        user.is_staff = True
-        self.assertFalse(is_trusted(request))
+        self.assertIs(processed.is_trusted, False)
 
-        del request.is_trusted
-        self.assertTrue(is_trusted(request))
+        processed.__dict__.pop('is_trusted')
+        self.assertIs(processed.is_trusted, True)
