@@ -78,7 +78,7 @@ class TrustingFunctionsTestCase(TestCase):
 
 class IsTrustedTestCase(TestCase):
     SETTINGS = {
-        'TRUSTING_FUNCTION': 'utils.auth.trust_only_staff',
+        'TRUSTING_FUNCTION': 'utils.trusting.trust_only_staff',
     }
 
     @override_settings(**SETTINGS)

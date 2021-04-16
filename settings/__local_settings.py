@@ -39,7 +39,7 @@ ALLOWED_HOSTS = ['example.com']    # YOU MUST EDIT THIS IN PRODUCTION
 # Overwrite project settings, or add your own below:
 SITE_NAME = '网站名称'
 
-TRUSTING_FUNCTION = 'campuscats.utils.auth.trust_by_network_email'
+TRUSTING_FUNCTION = 'utils.trusing.trust_by_network_email'
 TRUSTED_EMAIL_DOMAINS = ['@example.edu.cn']    # add '' to allow all
 # Find networks of your university here:
 # https://github.com/CaptainMorch/certnet_network_list
