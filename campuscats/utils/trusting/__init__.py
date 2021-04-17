@@ -3,3 +3,4 @@ from .verifier import (
     trust_only_staff, is_trusted,
 )
 from .middleware import TrustingMiddleware
+from .decorators import trusted_required

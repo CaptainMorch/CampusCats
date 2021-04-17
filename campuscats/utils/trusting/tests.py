@@ -1,11 +1,11 @@
 from ipaddress import IPv4Address, IPv4Network
 from django.test import TestCase, override_settings
-from django.http import HttpRequest
+from django.http import HttpRequest, HttpResponseForbidden
 
 from user.models import User
 from .verifier import is_email_trusted, is_group_trusted, is_network_trusted
 from .parser import parse_trusted_networks_setting
-from . import is_trusted, TrustingMiddleware
+from . import is_trusted, TrustingMiddleware, trusted_required
 
 
 class ParseTrustedNetworksSettingTestCase(TestCase):
@@ -79,15 +79,16 @@ class TrustingFunctionsTestCase(TestCase):
         self.assertFalse(is_network_trusted(request))
 
 
+def do_nothing(request):
+    return request
+
+
 @override_settings(TRUSTING_FUNCTION='utils.trusting.trust_only_staff')
 class TrustingMiddlewareTestCase(TestCase):
-    def do_nothing(self, request):
-        return request
-
     def test_middleware(self):
         request = HttpRequest()
         request.user = User()
-        processed = TrustingMiddleware(self.do_nothing)(request)
+        processed = TrustingMiddleware(do_nothing)(request)
 
         self.assertIs(processed.is_trusted, False)
 
@@ -97,3 +98,15 @@ class TrustingMiddlewareTestCase(TestCase):
 
         processed.__dict__.pop('is_trusted')
         self.assertIs(processed.is_trusted, True)
+
+
+class TrustedRequiredDecoratorTestCase(TestCase):
+    def test_decorator(self):
+        request = HttpRequest()
+        request.is_trusted = True
+        decorated = trusted_required(do_nothing)
+
+        self.assertIs(decorated(request), request)
+
+        request.is_trusted = False
+        self.assertIsInstance(decorated(request), HttpResponseForbidden)
