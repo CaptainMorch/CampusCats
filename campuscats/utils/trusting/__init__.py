@@ -4,3 +4,4 @@ from .verifier import (
 )
 from .middleware import TrustingMiddleware
 from .decorators import trusted_required
+from .permissions import IsTrusted, IsTrustedOrReadOnly

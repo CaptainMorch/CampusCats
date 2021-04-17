@@ -5,7 +5,10 @@ from django.http import HttpRequest, HttpResponseForbidden
 from user.models import User
 from .verifier import is_email_trusted, is_group_trusted, is_network_trusted
 from .parser import parse_trusted_networks_setting
-from . import is_trusted, TrustingMiddleware, trusted_required
+from . import (
+    is_trusted, TrustingMiddleware, trusted_required, IsTrusted,
+    IsTrustedOrReadOnly,
+)
 
 
 class ParseTrustedNetworksSettingTestCase(TestCase):
@@ -110,3 +113,37 @@ class TrustedRequiredDecoratorTestCase(TestCase):
 
         request.is_trusted = False
         self.assertIsInstance(decorated(request), HttpResponseForbidden)
+
+
+class TrustingPermissionTestCase(TestCase):
+    def test_is_trusted(self):
+        request = HttpRequest()
+        request.is_trusted = True
+
+        self.assertIs(
+            IsTrusted().has_permission(request, None),
+            True)
+
+        request.is_trusted = False
+        self.assertIs(
+            IsTrusted().has_permission(request, None),
+            False)
+
+    def test_is_trusted_or_readonly(self):
+        request = HttpRequest()
+        request.method = 'GET'
+        request.is_trusted = False
+
+        self.assertIs(
+            IsTrustedOrReadOnly().has_permission(request, None),
+            True)
+        
+        request.method = 'POST'
+        self.assertIs(
+            IsTrustedOrReadOnly().has_permission(request, None),
+            False)
+
+        request.is_trusted = True
+        self.assertIs(
+            IsTrustedOrReadOnly().has_permission(request, None),
+            True)
