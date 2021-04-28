@@ -1,4 +1,4 @@
-from django.test import TestCase, override_settings
+from django.test import TestCase, override_settings, Client
 from django.urls import path
 from django.core.exceptions import NON_FIELD_ERRORS
 from django.contrib.auth import get_user_model
@@ -36,3 +36,30 @@ class SessionLoginViewTestCase(TestCase):
         err = non_field_errors[0]
         self.assertIn('message', err)
         self.assertEqual(err['code'], 'invalid_login')
+
+
+@override_settings(ROOT_URLCONF='user.urls')
+class CSRFTokenViewTestCase(TestCase):
+    LOGIN_URL = '/session-login/'
+    CSRF_URL = '/csrf-token/'
+
+    def setUp(self):
+        self.client = Client(enforce_csrf_checks=True)
+
+    def test_csrf_fail(self):
+        """make sure csrf protection is properly set"""
+        response = self.client.post(
+            self.LOGIN_URL, {}, content_type='application/json')
+        self.assertEqual(response.status_code, 403)
+
+    def test_csrf_set(self):
+        self.client.get(self.CSRF_URL)
+        self.assertIn('csrftoken', self.client.cookies)
+
+        csrftoken = self.client.cookies['csrftoken'].value
+        # headers sent here should be converted to CGI format, so
+        # `X-CSRFToken` ends in `HTTP_X_CSRFTOKEN`
+        # https://docs.djangoproject.com/en/3.2/topics/testing/tools/#django.test.Client.get
+        headers = {'HTTP_X_CSRFTOKEN': csrftoken}
+        response = self.client.post(self.LOGIN_URL, **headers)
+        self.assertEqual(response.status_code, 400)

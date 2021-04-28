@@ -1,8 +1,11 @@
 from django.http.response import JsonResponse
+from django.views.decorators.csrf import ensure_csrf_cookie
+from django.utils.decorators import method_decorator
 from django.contrib.auth import logout
 from django.contrib.auth.views import LoginView
 
 from rest_framework.views import APIView
+from rest_framework.response import Response
 from rest_framework.permissions import IsAuthenticated
 from rest_framework.status import HTTP_200_OK, HTTP_400_BAD_REQUEST
 
@@ -48,3 +51,13 @@ class SessionLogoutView(APIView):
     def post(self, request, *args, **kwargs):
         logout(request)
         return JsonResponse({}, status=HTTP_200_OK)
+
+
+class CSRFTokenView(APIView):
+    """View that explictly sets csrf cookie to client.
+    
+    'safe' action, accepts GET only.
+    """
+    @method_decorator(ensure_csrf_cookie)
+    def get(self, *args, **kwargs):
+        return Response(status=HTTP_200_OK)
