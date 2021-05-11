@@ -39,11 +39,13 @@ ALLOWED_HOSTS = ['example.com']    # YOU MUST EDIT THIS IN PRODUCTION
 # Overwrite project settings, or add your own below:
 SITE_NAME = '网站名称'
 
-TRUSTING_FUNCTION = 'utils.trusing.trust_by_network_email'
+PERMISSION_FOR_VIEWING_LOCATIONS = 'authen.permissions.TrustByEmailNetworkGroup'
+PERMISSION_FOR_NON_SENSITIVE_ACTIONS = 'authen.permissions.TrustByEmailNetworkGroup'
+TRUSTED_GROUP = 'trusted'
 TRUSTED_EMAIL_DOMAINS = ['@example.edu.cn']    # add '' to allow all
 # Find networks of your university here:
 # https://github.com/CaptainMorch/certnet_network_list
-from utils.trusting.parser import parse_trusted_networks_setting
+from authen.utils import parse_trusted_networks_setting
 TRUSTED_NETWORKS = parse_trusted_networks_setting(
     ('0.0.0.0', '0.0.0.255'),    # IP range
     '0.0.0.0/24',                # IP network

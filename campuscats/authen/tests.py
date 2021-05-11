@@ -1,9 +1,19 @@
+from ipaddress import IPv4Address, IPv4Network
+
+from django.http import HttpRequest, HttpResponseForbidden
 from django.test import TestCase, override_settings, Client
 from django.urls import path
 from django.core.exceptions import NON_FIELD_ERRORS
 from django.contrib.auth import get_user_model
-from .views import SessionLoginView
+from django.contrib.auth.models import Group
 
+from .permissions import IsEmailTrusted, InTrustedNetworks, InTrustedGroup
+from .utils import parse_trusted_networks_setting
+
+
+#
+# View tests
+#
 
 @override_settings(ROOT_URLCONF='authen.urls')
 class SessionLoginViewTestCase(TestCase):
@@ -63,3 +73,106 @@ class CSRFTokenViewTestCase(TestCase):
         headers = {'HTTP_X_CSRFTOKEN': csrftoken}
         response = self.client.post(self.LOGIN_URL, **headers)
         self.assertEqual(response.status_code, 400)
+
+
+#
+# Permission Tests
+#
+
+class ParseTrustedNetworksSettingTestCase(TestCase):
+    def test_normal(self):
+        SETTING = [
+            '0.0.0.1',
+            ('0.0.0.0', '0.0.2.255'),
+            '0.0.3.0/24',
+            ('0.0.4.0', '0.0.4.255'),
+            '0.0.0.2',
+        ]
+        EXPECTED = [IPv4Network('0.0.0.1/32')]\
+            + [IPv4Network('0.0.0.0/23')]\
+            + [IPv4Network(f'0.0.{i}.0/24') for i in range(2, 5)]\
+            + [IPv4Network('0.0.0.2/32')]
+        output = parse_trusted_networks_setting(*SETTING)
+        self.assertListEqual(output, EXPECTED)
+
+    def test_invalid_address(self):
+        self.assertRaisesRegex(
+            ValueError, '"0.0.0.666" should be',
+            parse_trusted_networks_setting,
+            '0.0.0.666')
+
+    def test_invalid_range(self):
+        self.assertRaisesRegex(
+            ValueError, 'should be a 2-tuple',
+            parse_trusted_networks_setting,
+            ('0.0.0.0',)
+        )
+
+    def test_invalid_range_address(self):
+        self.assertRaisesRegex(
+            ValueError, 'contains invalid',
+            parse_trusted_networks_setting,
+            ('0.0.0.666', '0.0.0.1')
+        )
+
+
+class PermissionsTestCase(TestCase):
+    SETTING = {
+        'TRUSTED_EMAIL_DOMAINS': ['@example.edu.cn', '@example2.edu'],
+        'TRUSTED_NETWORKS': parse_trusted_networks_setting(
+                ('0.0.0.0', '0.0.0.255'), '1.1.1.1',
+            ),
+        'TRUSTED_USER_GROUP': 'trusted',
+    }
+    
+    @override_settings(**SETTING)
+    def test_email(self):
+        request = HttpRequest()
+        request.user = get_user_model()(email='notallowed@example2.edu.cn')
+        self.assertIs(
+            IsEmailTrusted().has_permission(request, None),
+            False)
+
+        request.user.email = 'allowed@example.edu.cn'
+        self.assertIs(
+            IsEmailTrusted().has_permission(request, None),
+            True)
+
+        request.user.is_active = False
+        self.assertIs(
+            IsEmailTrusted().has_permission(request, None),
+            False)
+
+    @override_settings(**SETTING)
+    def test_network(self):
+        request = HttpRequest()
+        request.META = {'REMOTE_ADDR': '0.0.0.1'}
+        self.assertIs(
+            InTrustedNetworks().has_permission(request, None),
+            True)
+
+        request.META['REMOTE_ADDR'] = '1.1.1.1'
+        self.assertIs(
+            InTrustedNetworks().has_permission(request, None),
+            True)
+
+        request.META['REMOTE_ADDR'] = '1.0.0.0'
+        self.assertIs(
+            InTrustedNetworks().has_permission(request, None),
+            False)
+
+    @override_settings(**SETTING)
+    def test_group(self):
+        group = Group.objects.create(name='trusted')
+        user = get_user_model().objects.create_user('test')
+        request = HttpRequest()
+        request.user = user
+
+        self.assertIs(
+            InTrustedGroup().has_permission(request, None),
+            False)
+
+        user.groups.add(group)
+        self.assertIs(
+            InTrustedGroup().has_permission(request, None),
+            True)
