@@ -2,7 +2,7 @@ from ipaddress import IPv4Address, IPv4Network
 from django.test import TestCase, override_settings
 from django.http import HttpRequest, HttpResponseForbidden
 
-from user.models import User
+from authen.models import User
 from .verifier import is_email_trusted, is_group_trusted, is_network_trusted
 from .parser import parse_trusted_networks_setting
 from . import (

@@ -5,7 +5,7 @@ from django.contrib.auth import get_user_model
 from .views import SessionLoginView
 
 
-@override_settings(ROOT_URLCONF='user.urls')
+@override_settings(ROOT_URLCONF='authen.urls')
 class SessionLoginViewTestCase(TestCase):
     URL = '/session-login/'
     USERNAME = 'test_user'
@@ -38,7 +38,7 @@ class SessionLoginViewTestCase(TestCase):
         self.assertEqual(err['code'], 'invalid_login')
 
 
-@override_settings(ROOT_URLCONF='user.urls')
+@override_settings(ROOT_URLCONF='authen.urls')
 class CSRFTokenViewTestCase(TestCase):
     LOGIN_URL = '/session-login/'
     CSRF_URL = '/csrf-token/'

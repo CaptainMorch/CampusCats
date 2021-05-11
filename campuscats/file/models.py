@@ -1,5 +1,6 @@
 from datetime import date
 from django.db import models
+from django.contrib.auth import get_user_model
 
 # Create your models here.
 class Photo(models.Model):
@@ -8,7 +9,7 @@ class Photo(models.Model):
     title = models.CharField('标题', blank=True, max_length=8)
     description = models.TextField('描述', blank=True)
     author = models.ForeignKey(
-        'user.User',
+        get_user_model(),
         verbose_name='拍摄者',
         on_delete=models.SET_NULL,
         null=True,
