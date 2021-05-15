@@ -1,11 +1,14 @@
 from django.contrib import admin
-from django.contrib.auth.admin import UserAdmin
-from .models import User
+from django.contrib.auth.admin import UserAdmin as DefaultUserAdmin
+from .models import User, Contact
 
-# Register your models here.
-contact_fieldset = ('Contact Info', {'fields': ('phone', 'qq', 'wx_id')})
 
-@admin.register(User)
-class CustomUserAdmin(UserAdmin):
-    fieldsets = UserAdmin.fieldsets + (contact_fieldset,)
-    add_fieldsets = UserAdmin.add_fieldsets + (contact_fieldset,)
+class ContactInline(admin.TabularInline):
+    model = Contact
+
+class UserAdmin(DefaultUserAdmin):
+    inlines = [
+        ContactInline,
+    ]
+
+admin.site.register(User, UserAdmin)
