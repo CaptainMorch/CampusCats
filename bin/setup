@@ -239,7 +239,7 @@ do_post_configure() {
 
 run_tests() {
     info "Running tests..."
-    if docker-compose exec web python manage.py test; then
+    if docker-compose exec web python -Wa manage.py test ./tests/; then
         success "Test passed."
     else
         erro "Test failed"

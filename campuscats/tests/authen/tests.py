@@ -7,8 +7,8 @@ from django.core.exceptions import NON_FIELD_ERRORS
 from django.contrib.auth import get_user_model
 from django.contrib.auth.models import Group
 
-from .permissions import IsEmailTrusted, InTrustedNetworks, InTrustedGroup
-from .utils import parse_trusted_networks_setting
+from authen.permissions import IsEmailTrusted, InTrustedNetworks, InTrustedGroup
+from authen.utils import parse_trusted_networks_setting
 
 
 #

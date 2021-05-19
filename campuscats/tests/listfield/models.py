@@ -9,9 +9,15 @@ class TestModel(models.Model):
     text1 = models.CharField(max_length=8, blank=True)
     text2 = models.CharField(max_length=8, blank=True)
 
+    class Meta:
+        app_label = 'listfield'
+
 
 class Father(models.Model):
     test_model = models.ForeignKey(
         'TestModel',
         on_delete=models.CASCADE
         )
+
+    class Meta:
+        app_label = 'listfield'

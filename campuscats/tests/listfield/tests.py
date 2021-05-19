@@ -29,6 +29,9 @@ class ListFieldCheckMethodsTestCase(SimpleTestCase):
             sep_not_single = ListField(max_length=16, sep=', ')
             sep_alphabetic = ListField(max_length=16, sep='a')
             mix = ListField(sep='S')
+
+            class Meta:
+                app_label = 'listfield'
         
         self.model = TestCheckModel()
 

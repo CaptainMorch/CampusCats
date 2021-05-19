@@ -1,5 +1,5 @@
 from django.test import TestCase
-from . import create_choices_class
+from utils import create_choices_class
 
 
 class CreateChoicesClassTests(TestCase):
