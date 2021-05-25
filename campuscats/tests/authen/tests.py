@@ -1,13 +1,13 @@
 from ipaddress import IPv4Address, IPv4Network
 
-from django.http import HttpRequest, HttpResponseForbidden
+from django.http import HttpRequest, HttpResponseForbidden, request
 from django.test import TestCase, override_settings, Client
 from django.urls import path
 from django.core.exceptions import NON_FIELD_ERRORS
 from django.contrib.auth import get_user_model
-from django.contrib.auth.models import Group
+from django.contrib.auth.models import Group, User, AnonymousUser
 
-from authen.permissions import IsEmailTrusted, InTrustedNetworks, InTrustedGroup
+from authen.permissions import IsEmailTrusted, InTrustedNetworks, InTrustedGroup, IsMemberOrReadOnly
 from authen.utils import parse_trusted_networks_setting
 
 
@@ -176,3 +176,41 @@ class PermissionsTestCase(TestCase):
         self.assertIs(
             InTrustedGroup().has_permission(request, None),
             True)
+
+class IsMemberOrReadOnlyTeastCase(TestCase):
+    def setUp(self):
+        self.member = User()
+        self.member.is_staff = True
+        self.unauth = AnonymousUser()
+
+    def test_safe(self):
+        request = HttpRequest()
+        request.method = 'GET'
+
+        request.user = self.unauth
+        self.assertIs(
+            IsMemberOrReadOnly().has_permission(request, None),
+            True,
+        )
+
+        request.user = self.member
+        self.assertIs(
+            IsMemberOrReadOnly().has_permission(request, None),
+            True,
+        )
+
+    def test_unsafe(self):
+        request = HttpRequest()
+        request.method = 'POST'
+
+        request.user = self.unauth
+        self.assertIs(
+            IsMemberOrReadOnly().has_permission(request, None),
+            False,
+        )
+        
+        request.user = self.member
+        self.assertIs(
+            IsMemberOrReadOnly().has_permission(request, None),
+            True,
+        )

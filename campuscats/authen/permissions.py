@@ -1,7 +1,8 @@
 from ipaddress import IPv4Address
 from django.conf import settings
 from django.utils.module_loading import import_string
-from rest_framework.permissions import BasePermission, IsAdminUser, AllowAny
+from rest_framework.permissions import (
+    BasePermission, IsAdminUser, AllowAny, SAFE_METHODS)
 
 
 class IsEmailTrusted(BasePermission):
@@ -38,7 +39,16 @@ class InTrustedGroup(BasePermission):
         return user.is_active and user.groups.filter(
                 name=settings.TRUSTED_USER_GROUP).exists()
 
-
+class IsMemberOrReadOnly(IsAdminUser):
+    """
+    Block anyone excepts members from accessing 'dangerous' methods
+    """
+    def has_permission(self, request, view):
+        if request.method in SAFE_METHODS:
+            return True
+        return super().has_permission(request, view)
+        
+        
 #
 # Permissions for using in settings
 #
