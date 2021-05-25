@@ -1,3 +1,8 @@
+import io
+from rest_framework.renderers import JSONRenderer
+from rest_framework.parsers import JSONParser
+
+
 class AssertSerializerValidationMixin:
     """Provides an asserting method for validation errors raised by serializers"""
     def assertValidationErrorCodes(self, errors, codes):
@@ -36,3 +41,12 @@ class AssertSerializerValidationMixin:
             "\nThe following fields didn't report any errors: {}".format(
                 ', '.join(codes.keys())
             ))
+
+
+def to_json_and_back(data):
+    """
+    Render `data` to json format and parse it back, to simulate a client reading it."""
+    json = JSONRenderer().render(data)
+    stream = io.BytesIO(json)
+    result = JSONParser().parse(stream)
+    return result
